@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f2e8d5">
+<title>浮生帖 · 你的前世身份</title>
+<meta name="description" content="一道古卷问帖，测出你的前世身份与今生烙印。手机端国风趣味测试。">
+<style>
+:root{
+  --bg:#f2e8d5; --paper:#faf4e6; --ink:#3d3226; --dim:#8c7c60; --seal:#a63a2b; --line:#d8c9a8;
+  --serif:"Noto Serif SC","Songti SC","KaiTi","SimSun",serif; --sans:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.75;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.35 0 0 0 0 0.2 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");}
+main{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 22px calc(52px + env(safe-area-inset-bottom))}
+.screen{display:none;animation:up .55s ease both}.screen.on{display:block}
+.screen:not(.on){display:none!important}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes unroll{from{opacity:0;transform:scaleY(.2)}to{opacity:1;transform:scaleY(1)}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.7) rotate(-20deg)}60%{opacity:1;transform:scale(.93) rotate(-8deg)}100%{opacity:1;transform:scale(1) rotate(-8deg)}}
+/* 开场 */
+#intro{min-height:100svh;display:flex;flex-direction:column;justify-content:center;text-align:center}
+.scroll{background:var(--paper);border:1px solid var(--line);box-shadow:0 14px 40px rgba(90,70,40,.18);padding:28px 22px 26px;position:relative;animation:unroll .8s ease both}
+.scroll::before,.scroll::after{content:"";position:absolute;left:-6px;right:-6px;height:14px;background:#e0d2b2;border:1px solid var(--line)}
+.scroll::before{top:-14px}.scroll::after{bottom:-14px}
+.scroll .pinyin{font-size:11px;color:var(--dim);letter-spacing:.6em;text-indent:.6em}
+.scroll h1{font-family:var(--serif);font-weight:900;font-size:clamp(30px,8.5vw,40px);letter-spacing:.2em;margin:8px 0 4px}
+.scroll .sub{font-family:var(--serif);color:var(--dim);font-size:14px;letter-spacing:.1em}
+.btn{cursor:pointer;border:none;font-family:var(--serif);letter-spacing:.3em;text-indent:.3em;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn-seal{margin-top:20px;background:var(--seal);color:#f6e8d2;font-size:15px;padding:13px 40px;border-radius:3px;box-shadow:0 8px 24px rgba(166,58,43,.3)}
+.meta{margin-top:14px;display:flex;gap:8px;justify-content:center}
+.meta span{font-size:11px;color:var(--dim);border:1px solid var(--line);padding:4px 12px;border-radius:2px;background:var(--paper)}
+.foot{margin-top:16px;font-size:11px;color:#b3a284;letter-spacing:.3em}
+/* 通用 */
+.kicker{font-family:var(--serif);color:var(--seal);font-size:12px;letter-spacing:.45em;margin:24px 0 10px}
+h2{font-family:var(--serif);font-size:24px;font-weight:900;letter-spacing:.06em}
+.sub2{color:var(--dim);font-size:13px;margin:6px 0 24px}
+.opts{display:grid;gap:11px}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:12px 14px;background:var(--paper);border:1px solid var(--line);color:var(--ink);font-family:var(--sans);font-size:14px;cursor:pointer;border-radius:2px;transition:border-color .2s,background .2s}
+.opt:active{transform:scale(.985)}
+.opt .mark{flex:none;width:30px;height:30px;display:grid;place-items:center;font-family:var(--serif);font-weight:900;font-size:13px;color:var(--seal);border:1px solid var(--line);border-radius:2px;background:#fff8ea}
+.opt.sel{border-color:var(--seal);background:#fdf3df}
+.opt.sel .mark{background:var(--seal);color:#f6e8d2;border-color:var(--seal)}
+.nav{display:flex;gap:10px;margin-top:20px}
+.btn-ghost{flex:1;background:none;border:1px solid var(--line);color:var(--dim);font-size:14px;padding:13px;border-radius:2px}
+.btn-go{flex:2;background:var(--seal);color:#f6e8d2;font-size:14px;padding:13px;border-radius:2px}
+.btn-go:disabled{opacity:.35}
+/* 答题 */
+#quizChrome{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 80%,transparent);margin:0 -22px;padding:14px 22px 12px}
+.ptop{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);letter-spacing:.2em;margin-bottom:8px}
+.ptop b{color:var(--seal);font-family:var(--serif)}
+.track{height:2px;background:var(--line)}
+.track i{display:block;height:100%;background:var(--seal);transition:width .4s}
+.q-tag{display:inline-block;margin-top:16px;font-size:11px;color:var(--seal);border:1px solid var(--line);padding:3px 12px;border-radius:2px;background:var(--paper);letter-spacing:.25em}
+.q-text{font-family:var(--serif);font-size:21px;font-weight:900;margin:14px 0 20px;line-height:1.6}
+.hint{margin-top:16px;font-size:12px;color:var(--dim);opacity:0;transition:opacity .3s}.hint.on{opacity:1}
+/* 结果 */
+#result{padding-top:46px}
+.sheet{background:var(--paper);border:1px solid var(--line);box-shadow:0 14px 40px rgba(90,70,40,.18);padding:44px 24px 34px;position:relative;animation:unroll .8s ease both}
+.sheet .seal-stamp{position:absolute;top:18px;right:16px;width:64px;height:64px;display:grid;place-items:center;background:linear-gradient(140deg,#a63a2b,#7d2b20);border-radius:5px;transform:rotate(-8deg);box-shadow:0 6px 20px rgba(166,58,43,.4);animation:stamp .8s ease both .4s}
+.sheet .seal-stamp b{font-family:var(--serif);font-size:28px;color:#f6e8d2;font-weight:900}
+.r-eyebrow{text-align:center;font-size:11px;color:var(--dim);letter-spacing:.5em}
+.r-name{text-align:center;font-family:var(--serif);font-size:clamp(36px,10.5vw,48px);font-weight:900;letter-spacing:.15em;margin-top:10px}
+.r-dyn{text-align:center;color:var(--dim);font-size:12.5px;letter-spacing:.2em;margin-top:6px}
+.r-quote{text-align:center;font-family:var(--serif);color:var(--seal);font-size:15px;margin-top:16px}
+.blk{margin-top:34px;text-align:left}
+.blk h3{font-family:var(--serif);font-size:16px;font-weight:900;display:flex;align-items:center;gap:12px}
+.blk h3::before{content:"";width:4px;height:16px;background:var(--seal)}
+.blk h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.blk h3 small{font-size:11px;color:var(--dim);font-weight:400;letter-spacing:.2em}
+.body-txt{margin-top:12px;font-size:14.5px;color:#5a4d3a;text-align:justify}
+.bars{display:grid;gap:11px;margin-top:14px}
+.bar{display:grid;grid-template-columns:72px 1fr 40px;gap:10px;align-items:center}
+.bar span{font-size:12.5px;color:var(--dim)}
+.bar b{font-family:var(--serif);color:var(--seal);font-size:14px;text-align:right}
+.bar .tk{height:7px;background:#e6d9ba;border-radius:4px;overflow:hidden}
+.bar .tk i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8a5a2a,var(--seal));transition:width 1s ease}
+.note{background:#fff8ea;border:1px solid var(--line);border-radius:2px;padding:14px 16px;margin-top:10px}
+.note b{display:block;font-size:12px;color:var(--seal);letter-spacing:.15em;margin-bottom:4px;font-family:var(--serif)}
+.note p{font-size:13.5px;color:#6a5c44}
+.tags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.tags span{font-size:12px;color:var(--seal);border:1px solid rgba(166,58,43,.4);background:rgba(166,58,43,.07);padding:4px 12px;border-radius:2px}
+.rate-wrap{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-top:24px}
+.rate{font-family:var(--serif);font-size:54px;font-weight:900;color:var(--seal);line-height:1}
+.rate-cap{font-size:12px;color:var(--dim);letter-spacing:.3em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:18px}
+.stat{border:1px solid var(--line);background:#fff8ea;border-radius:2px;padding:11px 4px 9px;text-align:center}
+.stat b{display:block;font-family:var(--serif);font-size:18px;color:var(--seal);letter-spacing:.02em}
+.stat span{display:block;font-size:10.5px;color:var(--dim);letter-spacing:.14em;margin-top:3px}
+.ranks{display:grid;gap:9px;margin-top:14px}
+.rank{display:grid;grid-template-columns:30px 1fr 50px;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);border-radius:2px;background:var(--paper)}
+.rank.first{border-color:var(--seal);background:#fdf3df}
+.rank .rk{font-family:var(--serif);color:var(--seal);font-size:14px;text-align:center}
+.rank .nm b{display:block;font-family:var(--serif);font-size:15px;color:var(--ink);letter-spacing:.06em}
+.rank .nm small{display:block;color:var(--dim);font-size:11px;margin-top:1px}
+.rank .nm i{display:block;height:3px;background:#e6d9ba;border-radius:2px;margin-top:6px;overflow:hidden;font-style:normal}
+.rank .nm i u{display:block;height:100%;background:linear-gradient(90deg,#8a5a2a,var(--seal));text-decoration:none;transition:width 1s ease;width:0}
+.rank .pct{font-family:var(--serif);font-weight:900;color:var(--seal);font-size:16px;text-align:right}
+.kchip{display:flex;flex-direction:column;align-items:center;gap:4px;margin-top:14px}
+.kchip b{font-family:var(--serif);font-size:13px;font-weight:900;color:var(--seal);border:1px solid rgba(166,58,43,.45);background:rgba(166,58,43,.07);padding:5px 16px;border-radius:2px;letter-spacing:.14em}
+.kchip span{font-size:10.5px;color:var(--dim);letter-spacing:.05em}
+.bar span em{display:block;font-size:9px;color:#b3a284;letter-spacing:.14em;font-style:normal;line-height:1.25;margin-top:1px}
+.rank .nm b em{font-size:9.5px;color:#b3a284;letter-spacing:.16em;font-style:normal;font-weight:400;margin-left:6px}
+.pay{margin-top:38px;border:1.5px solid rgba(166,58,43,.45);border-radius:4px;padding:22px 20px;background:linear-gradient(160deg,#fdf3df,#f7e9c9)}
+.pay h4{font-family:var(--serif);font-size:17px;color:var(--seal);letter-spacing:.12em}
+.pay p{font-size:12.5px;color:var(--dim);margin:6px 0 14px;text-align:left}
+.pay button{width:100%;background:var(--seal);color:#f6e8d2;font-size:15px;font-weight:700;padding:13px;border-radius:3px;letter-spacing:.2em}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:28px}
+.btn-share{background:var(--seal);color:#f6e8d2;font-size:14.5px;padding:14px;border-radius:3px}
+.r-foot{text-align:center;margin-top:30px;font-size:10.5px;color:#b3a284;letter-spacing:.3em}
+.mask{position:fixed;inset:0;z-index:20;background:rgba(50,38,20,.8);display:none;place-items:center;padding:18px}
+.mask.on{display:grid}
+.panel{background:var(--paper);max-width:92vw;max-height:86svh;overflow:auto;padding:12px;border-radius:6px}
+.panel img{display:block;max-width:100%}
+.panel .tip{text-align:center;font-size:12px;color:var(--dim);margin-top:8px}
+.panel .close{float:right;width:28px;height:28px;background:none;border:1px solid var(--line);color:var(--dim);border-radius:2px;cursor:pointer;font-size:15px}
+/* ===== 验帖门 ===== */
+body.gate-on{overflow:hidden;height:100%}
+.gate{position:fixed;inset:0;z-index:99;display:grid;place-items:center;background:var(--bg);padding:24px;transition:opacity .5s ease,visibility .5s ease}
+.gate.off{opacity:0;visibility:hidden}
+.gate-box{position:relative;width:min(340px,100%);text-align:center;padding:34px 24px 28px;background:var(--paper);border:1px solid var(--line);box-shadow:0 14px 40px rgba(90,70,40,.18)}
+.gate-box::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--seal)}
+.gate-box::after{content:"";position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--seal)}
+.gate-stamp{position:absolute;top:14px;right:12px;width:44px;height:44px;display:grid;place-items:center;background:linear-gradient(140deg,#a63a2b,#7d2b20);border-radius:4px;transform:rotate(-8deg);box-shadow:0 4px 14px rgba(166,58,43,.35)}
+.gate-stamp b{font-family:var(--serif);font-size:20px;color:#f6e8d2;font-weight:900}
+.gate-eyebrow{font-family:var(--serif);color:var(--seal);font-size:12px;letter-spacing:.45em;text-indent:.45em}
+.gate-title{font-family:var(--serif);font-size:30px;font-weight:900;letter-spacing:.2em;text-indent:.2em;margin-top:6px;color:var(--ink)}
+.gate-rule{width:44px;height:2px;background:var(--seal);margin:12px auto 10px}
+.gate-sub{color:var(--dim);font-size:12.5px;letter-spacing:.15em}
+.gate-input{display:block;width:100%;margin:22px 0 0;background:#fff8ea;border:1px solid var(--line);border-radius:2px;color:var(--seal);font-family:var(--serif);font-size:26px;font-weight:900;letter-spacing:.55em;text-indent:.55em;text-align:center;padding:13px 0;outline:none;caret-color:var(--seal);transition:border-color .25s,box-shadow .25s}
+.gate-input:focus{border-color:var(--seal);box-shadow:0 0 0 1px rgba(166,58,43,.3)}
+.gate-btn{margin-top:14px;width:100%;background:var(--seal);color:#f6e8d2;font-size:15px;padding:13px;border-radius:3px;box-shadow:0 8px 24px rgba(166,58,43,.3)}
+.gate-err{margin-top:12px;font-size:12px;color:var(--seal);letter-spacing:.15em;opacity:0;transition:opacity .3s}
+.gate-err.on{opacity:1}
+.gate.shake .gate-box{animation:shake .45s ease}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+</style>
+</head>
+<body class="gate-on">
+<div id="gate">
+  <div class="gate-box">
+    <div class="gate-stamp"><b>验</b></div>
+    <div class="gate-eyebrow">浮生帖 · 验帖</div>
+    <div class="gate-title">帖号核验</div>
+    <div class="gate-rule"></div>
+    <div class="gate-sub">输入六位帖号，翻阅前世</div>
+    <input class="gate-input" id="gateInput" type="text" inputmode="numeric" maxlength="6" autocomplete="off">
+    <button class="btn gate-btn" id="gateBtn">启 帖</button>
+    <div class="gate-err" id="gateErr">帖号有误，请核对后再试</div>
+  </div>
+</div>
+<main>
+  <section class="screen on" id="intro">
+    <div class="scroll">
+      <div class="pinyin">QIANSHI TIE · 前世问帖</div>
+      <h1>浮生帖</h1>
+      <p class="sub">十八问定前世 · 一帖知今生</p>
+      <button class="btn btn-seal" id="startBtn">开 帖 问 命</button>
+      <div class="meta"><span>18 题</span><span>约 3 分钟</span><span>8 种前世</span></div>
+    </div>
+    <div class="foot">国风趣味测试 · 结果供娱乐自省</div>
+  </section>
+
+  <section class="screen" id="preference">
+    <div class="kicker">择路 · 选一则</div>
+    <h2>你想问哪种前世？</h2>
+    <p class="sub2">帖路不同，故事不同。</p>
+    <div class="opts" id="modeGrid">
+      <button class="opt" data-mode="free"><span class="mark">任</span><span>不限朝代 <small style="color:var(--dim)">——哪里有我的故事，就去哪里</small></span></button>
+      <button class="opt" data-mode="art"><span class="mark">文</span><span>偏好文脉 <small style="color:var(--dim)">——书斋、笔墨、江山风月</small></span></button>
+      <button class="opt" data-mode="war"><span class="mark">武</span><span>偏好武脉 <small style="color:var(--dim)">——边关、马蹄、刀光剑影</small></span></button>
+    </div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prefBack">返回</button>
+      <button class="btn btn-go" id="prefNext" disabled>进入问帖</button>
+    </div>
+  </section>
+
+  <section class="screen" id="question">
+    <div id="quizChrome">
+      <div class="ptop"><b id="qNo">其一</b><span id="pText">1 / 10</span></div>
+      <div class="track"><i id="tFill"></i></div>
+    </div>
+    <span class="q-tag" id="qTag"></span>
+    <h2 class="q-text" id="qText"></h2>
+    <div class="opts" id="optList"></div>
+    <div class="hint" id="hint">已落笔，墨迹渐显…</div>
+    <div class="nav">
+      <button class="btn btn-ghost" id="prevBtn">上一问</button>
+      <button class="btn btn-go" id="nextBtn" disabled>下一问</button>
+    </div>
+  </section>
+
+  <section class="screen" id="result">
+    <div class="sheet">
+      <div class="seal-stamp"><b id="sealChar">生</b></div>
+      <div class="r-eyebrow">前 世 已 显</div>
+      <div class="r-name" id="rName"></div>
+      <div class="r-dyn" id="rDyn"></div>
+      <div class="r-quote" id="rQuote"></div>
+      <div class="kchip"><b id="rKarma"></b><span>浮生档 KARMA 编码 · 前世身份代号 + 魂魄契合度</span></div>
+      <div class="tags" id="rTags"></div>
+      <div class="rate-wrap"><span class="rate" id="matchRate">0%</span><span class="rate-cap">宿命契合</span></div>
+      <div class="stats" id="statRow"></div>
+    </div>
+
+    <div class="blk"><h3><small>壹</small>前世画像</h3><p class="body-txt" id="rBody"></p></div>
+    <div class="blk"><h3><small>贰</small>魂魄构成</h3><div class="bars" id="rBars"></div></div>
+    <div class="blk"><h3><small>叁</small>专属解读<small>为你而写</small></h3><p class="body-txt" id="rDeep"></p></div>
+    <div class="blk"><h3><small>肆</small>前世榜</h3><div class="ranks" id="rankList"></div></div>
+    <div class="blk"><h3><small>伍</small>今生烙印</h3>
+      <div class="note"><b>今生遗留的印记</b><p id="rMark"></p></div>
+      <div class="note"><b>给你的提醒</b><p id="rTip"></p></div>
+    </div>
+
+    <div class="pay" id="payBox" hidden>
+      <h4>完整版 · 浮生帖全卷</h4>
+      <p>含前世完整故事线、名字与时代推演、今生课题与缘分解读。</p>
+      <button class="btn" id="payBtn">解锁全卷</button>
+    </div>
+
+    <div class="acts">
+      <button class="btn btn-share" id="shareBtn">生成浮生帖长图</button>
+      <button class="btn btn-ghost" id="againBtn">再问一次</button>
+    </div>
+    <div class="r-foot">浮生帖 · 前世问命 · 趣味测试</div>
+  </section>
+</main>
+
+<div class="mask" id="mask"><div class="panel"><button class="close" id="mClose">×</button><img id="mImg" alt="长按保存"><div class="tip">长按图片 · 保存到相册</div></div></div>
+
+<script>
+/* ========== 验帖门 ========== */
+const GATE_CODE="683520";
+const gateEl=document.getElementById("gate"),gateInput=document.getElementById("gateInput"),gateErr=document.getElementById("gateErr");
+gateInput.addEventListener("input",()=>{gateInput.value=gateInput.value.replace(/\D/g,"").slice(0,6);gateErr.classList.remove("on")});
+function gateTry(){
+  if(gateInput.value.trim()===GATE_CODE){
+    document.body.classList.remove("gate-on");
+    gateEl.classList.add("off");
+  }else{
+    gateEl.classList.remove("shake");void gateEl.offsetWidth;gateEl.classList.add("shake");
+    gateErr.classList.add("on");
+    gateInput.focus();gateInput.select();
+  }
+}
+document.getElementById("gateBtn").onclick=gateTry;
+gateInput.addEventListener("keydown",e=>{if(e.key==="Enter")gateTry()});
+
+const SHOP_URL=""; // ← 填小红书店铺商品链接
+const SOULS=["将","相","商","僧","匠","侠","医","士"];
+const SOUL_KEYS={"将":"武将","相":"庙堂文臣","商":"商贾巨富","僧":"方外之人","匠":"百工巨匠","侠":"江湖游侠","医":"悬壶医者","士":"寒窗文士"};
+const LIVES={
+  "武将":{dyn:"铁马冰河",quote:"一寸山河一寸血，我守过的城，每一块砖都记得我。",tags:["担当","血性","护佑"],
+    body:"你前世是守土之人。烽火岁月里，你把身后的人护得很稳，把自己的生死看得很轻。你习惯站在最危险的位置，因为你知道，你退一步，身后就多一步危险。",
+    mark:"今生你依然见不得身边人受欺负；遇事先想『我来』，最后才想到自己。",
+    tip:"担当是美德，也是重量。学会把一部分信任交出去，让肩膀透口气。"},
+  "庙堂文臣":{dyn:"庙堂风云",quote:"天下事，总要有人蘸着墨，一点点写直。",tags:["格局","谋略","秩序"],
+    body:"你前世立于庙堂之上。你有比旁人更长的耐心与更远的目光，擅长在错综的局势里理出一条能走的路。你信制度与秩序，也愿意为它们承受争议。",
+    mark:"今生你看不惯混乱与不合理，总想『立规矩』；开会时常常不自觉成了那个总结的人。",
+    tip:"规矩服务于人，不是相反。偶尔允许一点『不整齐』，生活会松一些。"},
+  "商贾巨富":{dyn:"市井烟火",quote:"银钱如水，会流的人，才真正富有。",tags:["精明","信用","长线"],
+    body:"你前世行走市井，白手起家。你懂得资源的来路与去处，把『信用』看得比金子更重。你富过也败过，最后明白了：生意是人心的生意。",
+    mark:"今生你对数字与机会格外敏锐；总在琢磨『这事儿怎么做得更好』。",
+    tip:"算得清利益，也要算得清感情。给重要的人和事留一点『不计回报』。"},
+  "方外之人":{dyn:"青灯古卷",quote:"我不避世，我只是看清了什么值得留。",tags:["清醒","自由","通透"],
+    body:"你前世是山门里的人。热闹散场后，你选择一条向内的路：读书、种茶、看云。你不是逃避世界，而是看清了世界的轻重。",
+    mark:"今生你在人群里总有一小块『离线区域』；对热闹既享受又抽离。",
+    tip:"保持你的清醒，但别把所有靠近都当成打扰——有些连接值得深入。"},
+  "百工巨匠":{dyn:"鲁班门下",quote:"一凿一斧，都是心里的图样。",tags:["专注","手感","极致"],
+    body:"你前世是手艺人。一根线、一道纹，你可以磨上一整天。你相信东西会说话：用心的器物自带光，敷衍的活儿藏不住糙。",
+    mark:"今生你对『细节粗糙』难以容忍；做事进入状态后，听不见外界。",
+    tip:"极致是你的天赋，但记得：完成一个，胜过打磨十个未成品。"},
+  "江湖游侠":{dyn:"快意恩仇",quote:"路见不平，我的剑比我先出鞘。",tags:["自由","义气","热血"],
+    body:"你前世行走江湖。你的原则简单而硬核：义字当头，恩怨分明。你不愿被任何屋檐长住地困住，但你为值得的人，可以留下。",
+    mark:"今生你讨厌被管束，讨厌复杂的人情套路；朋友有难，你总是最先到场。",
+    tip:"自由与承诺并不冲突——找到值得的你自然会留下，别让『怕被困』挡住真正的缘分。"},
+  "悬壶医者":{dyn:"杏林春暖",quote:"医的是病，救的是人，见的是心。",tags:["细致","仁心","冷静"],
+    body:"你前世行医。乱世里你背着药箱走村过镇，见惯生死，所以格外珍惜每个活着的人。你的冷静不是无情，是把情绪换成了行动。",
+    mark:"今生朋友不舒服，你总是第一个注意到；你关心人，但不太会表达。",
+    tip:"把关怀说出口。你的细心是礼物，说出来才收得到。"},
+  "寒窗文士":{dyn:"青衫笔墨",quote:"十年寒窗，不为功名，为心中那口气。",tags:["才情","执着","敏感"],
+    body:"你前世是读书人。油灯下你写过的字，比说过的话多。你有满腹的丘壑与不平，习惯把情感寄进笔墨——你的世界，安静但很大。",
+    mark:"今生你表达欲强，对文字与美敏感；有时想得太多，落笔太迟。",
+    tip:"别等完美才出手。你的声音值得被更早听见。"}
+};
+/* 三字母英文代号：本测维度与身份同源（魂魄构成即八身份占比），身份/维度共用一表 */
+const SOUL_CODE={"武将":"WAR","庙堂文臣":"MIN","商贾巨富":"MER","方外之人":"MON","百工巨匠":"ART","江湖游侠":"XIA","悬壶医者":"MED","寒窗文士":"SCH"};
+/* 专属解读素材：身份专属 hi（嵌魂魄峰值 {peak}）+ 礼物总结 + 行动建议 */
+const DEEP={
+  "武将":{hi:"你前世是执剑守城的人，八种魂魄里最滚烫的一种。此番魂魄峰值 {peak} 分——那股遇事先说『我来』的血性，隔着轮回也没凉。",
+    gift:"你今生的担当，是前世 TA 留给你的那把老刀——护过一城人，如今也该护护你自己。",
+    act:"本周做一件小事：把『我来』之后的累，说给一个人听，让肩膀真的透口气。"},
+  "庙堂文臣":{hi:"你前世立于庙堂之上，一支笔理千头万绪。魂魄峰值 {peak} 分，那份把乱局理出章程的耐心，今生仍在你身上静静发力。",
+    gift:"你今生的条理，是前世 TA 留给你的那支笔——写过江山奏章，也该为你自己写写心事。",
+    act:"下次事情扎堆时，先写三行清单：只解决一件事、只说三个要点，你会比谁都稳。"},
+  "商贾巨富":{hi:"你前世行走市井，把日子过成一本算得清的账。魂魄峰值 {peak} 分——对机会的敏锐与对信用的执念，是你带回今生的真金。",
+    gift:"你今生的敏锐，是前世 TA 留给你的那把旧算盘——算得清得失，也请记得给自己留一份不计回报。",
+    act:"今晚花十分钟给手头的事排个序，把最要紧的一件排在明天第一个做。"},
+  "方外之人":{hi:"你前世在山门里煮茶看云，活得比谁都清楚。魂魄峰值 {peak} 分，那份热闹散场后的清醒，今生依然是你最贵的底牌。",
+    gift:"你今生的通透，是前世 TA 留给你的那串念珠——提醒你在喧嚣里，随时能摸回内心的静。",
+    act:"每天睡前留十分钟，手机放远一点，发呆也好、写三行日记也好，把『离线区』扩大一点。"},
+  "百工巨匠":{hi:"你前世是作坊里的手艺人，一凿一斧皆见心思。魂魄峰值 {peak} 分——那双容不下『粗糙』的眼睛，如今仍在替你把关。",
+    gift:"你今生的专注，是前世 TA 留给你的那柄刻刀——雕过传世的器物，也请雕好当下的每一天。",
+    act:"挑一件拖了很久的小事，专注二十五分钟把它做完，找一找『完成』的手感。"},
+  "江湖游侠":{hi:"你前世快意江湖，义字刻在骨头里。魂魄峰值 {peak} 分，那份朋友有难最先到场的热血，隔着轮回依旧发烫。",
+    gift:"你今生的仗义，是前世 TA 留给你的那柄剑鞘——出鞘为朋友，入鞘时也记得抱抱自己。",
+    act:"这周约一位你惦记很久的朋友见一面——江湖情义，见面才算数。"},
+  "悬壶医者":{hi:"你前世背着药箱走村过镇，见惯生死，更惜人间。魂魄峰值 {peak} 分——那份不动声色的牵挂，是你此生最柔软的行囊。",
+    gift:"你今生的体贴，是前世 TA 留给你的那只药箱——医过许多人，这一次请先医自己的疲惫。",
+    act:"今晚把自己的累当成『病人的主诉』认真对待：早点睡，或郑重安排一次休息。"},
+  "寒窗文士":{hi:"你前世青灯下写过的字，比说过的话多。魂魄峰值 {peak} 分，满腹丘壑与对文字的痴，是你轮回里最重的行李。",
+    gift:"你今生的才情，是前世 TA 留给你的那半部书稿——未写完的话，今生由你接着写。",
+    act:"今天就动笔写下最近的一个念头，先写满一百字再停——落笔即胜利。"}
+};
+/* 维度专属赞美（嵌 {n} 真实分数）与最低维温柔成长句 */
+const PRAISE={
+  "武将":"「武将」之魂 {n} 分——遇事敢扛、临危不乱的胆魄，是你魂魄里最硬的那根梁。",
+  "庙堂文臣":"「庙堂文臣」之魂 {n} 分——在乱局里理出章程的长目光，是你最被低估的天赋。",
+  "商贾巨富":"「商贾巨富」之魂 {n} 分——对资源与机会的嗅觉，让你总能找到『走得通的那条路』。",
+  "方外之人":"「方外之人」之魂 {n} 分——身在热闹、心有净地的抽离感，是你难得的清醒。",
+  "百工巨匠":"「百工巨匠」之魂 {n} 分——对细节近乎苛刻的讲究，是你把事做到极致的底气。",
+  "江湖游侠":"「江湖游侠」之魂 {n} 分——恩怨分明、说走就走的爽利，让身边人觉得你『真』。",
+  "悬壶医者":"「悬壶医者」之魂 {n} 分——别人还没开口，你已察觉不对的细腻，是你无声的温柔。",
+  "寒窗文士":"「寒窗文士」之魂 {n} 分——对文字与美的敏感，是你天生自带的表达天赋。"
+};
+const LOW={
+  "武将":"至于最沉睡的「武将」一魂（{n} 分）——遇到必须硬气的场合，你心里其实先虚了一下。没关系，勇气从来不是不怕，而是怕着怕着还是站了出去；你已经在路上了。",
+  "庙堂文臣":"至于最沉睡的「庙堂文臣」一魂（{n} 分）——面对混乱与扯皮，你容易烦躁又无力。想立规矩的心没有错，只是可以先把『管不了的事』轻轻放下，护好自己的秩序感。",
+  "商贾巨富":"至于最沉睡的「商贾巨富」一魂（{n} 分）——跟人谈钱谈利益时，你常常不好意思。这不叫迂，只是提醒你：把价值说清楚，也是对彼此的尊重。",
+  "方外之人":"至于最沉睡的「方外之人」一魂（{n} 分）——你很难真正放空，总觉得闲下来是浪费。会休息的人才走得远，试着给自己留一段『什么都不做』的时光。",
+  "百工巨匠":"至于最沉睡的「百工巨匠」一魂（{n} 分）——重复打磨一件小事时，你容易坐不住。别苛责自己，先从十五分钟的专注练起，手感会一点点回来。",
+  "江湖游侠":"至于最沉睡的「江湖游侠」一魂（{n} 分）——需要你『冲出去』的场合，你总想再等一等。慢热不是错，只是别让等待变成错过，想做的事趁热去开始。",
+  "悬壶医者":"至于最沉睡的「悬壶医者」一魂（{n} 分）——照顾别人时你游刃有余，轮到自己却常常硬扛。把对自己的关怀也当成正事，你值得被同样温柔地对待。",
+  "寒窗文士":"至于最沉睡的「寒窗文士」一魂（{n} 分）——心里的感受很多，落到纸上却总犹豫。不必等想清楚才动笔，写下来的那一刻，你就已经赢过犹豫了。"
+};
+const Q=[
+  ["抉择","城门将破，粮草只够三天，你会？",[["死守，城在人在","武将"],["修书求援，同时安抚民心","庙堂文臣"],["开市募粮，重金悬赏","商贾巨富"],["带百姓走山道，另寻生机","江湖游侠"]]],
+  ["独处","难得的清净一日，你更想？",[["练武淬体，不敢懈怠","武将"],["抄书作画，磨一方墨","寒窗文士"],["算账理货，盘一盘家底","商贾巨富"],["焚香煮茶，看云过山头","方外之人"]]],
+  ["金钱","意外得到一笔大钱，第一反应？",[["分给弟兄和穷苦人","江湖游侠"],["购置田产，细水长流","商贾巨富"],["购置药材器械，扩充营生","悬壶医者"],["买书请先生，资助后生","寒窗文士"]]],
+  ["冲突","当街有人仗势欺人，你会？",[["直接出手，先解眼前围","江湖游侠"],["记下此人，走官府程序","庙堂文臣"],["出钱摆平，别耽误正事","商贾巨富"],["默默扶起伤者先治伤","悬壶医者"]]],
+  ["重任","最吃力不讨好的差事落到你头上？",[["接下，总得有人扛","武将"],["理清利弊，讨个章程再接","庙堂文臣"],["接下，把它做成生意","商贾巨富"],["婉拒，把它交给更合适的人","方外之人"]]],
+  ["价值","若只能留下一样东西给后世？",[["一座修好的城","武将"],["一部写完的书","寒窗文士"],["一门传世的手艺","百工巨匠"],["一个治好的疑难方子","悬壶医者"]]],
+  ["遗憾","深夜难眠，你最常想起？",[["没能守住的那个缺口","武将"],["那封没递出去的谏书","庙堂文臣"],["错信的那个人","商贾巨富"],["没来得及救的那个人","悬壶医者"]]],
+  ["同行","要走一段险路，你带上谁？",[["可靠的旧部","武将"],["机变的向导","江湖游侠"],["能算会画的账房","商贾巨富"],["谁也不带，独自上路","方外之人"]]],
+  ["名声","你更在意哪种评价？",[["『TA 守住了』","武将"],["『TA 说得对』","寒窗文士"],["『TA 讲信用』","商贾巨富"],["『TA 有本事』","百工巨匠"]]],
+  ["来生","若能选择来生再做一次，你选？",[["仍做执剑人","武将"],["换一支笔写完想说的话","寒窗文士"],["去更大的世界看看","江湖游侠"],["就这样，挺好","方外之人"]
+  ]],
+  ["前尘","轮回渡口，孟婆允你带一样旧物转世，你伸手拿？",[["护身的老刀","武将"],["半部未写完的书稿","寒窗文士"],["祖传的旧算盘","商贾巨富"],["一串温润的念珠","方外之人"]]],
+  ["执念","若说前世有一桩未了之事，你猜是？",[["有一仗没打完","武将"],["有一状没递上","庙堂文臣"],["有一诺没兑现","江湖游侠"],["有一味药没配齐","悬壶医者"]]],
+  ["故地","梦回前世，你最常梦见的地方是？",[["藏书万卷的旧阁楼","寒窗文士"],["晨钟暮鼓的山门","方外之人"],["千帆往来的码头","商贾巨富"],["刨花满地的作坊","百工巨匠"]]],
+  ["旧物","古玩摊上，哪件旧物会让你挪不动步？",[["一柄剑鞘斑驳的长剑","江湖游侠"],["一方磨穿的旧砚","寒窗文士"],["一件錾纹的银器","百工巨匠"],["一卷手抄的医典","悬壶医者"]]],
+  ["同袍","前世与你最亲的那个人，是？",[["同门学艺的师兄弟","百工巨匠"],["同朝为官的旧同僚","庙堂文臣"],["同榻论道的方外友","方外之人"],["一起走镖的弟兄","江湖游侠"]]],
+  ["天命","宿命给前世的你写好了结局，你盼那句批语是？",[["战功赫赫，马革裹尸","武将"],["一身清誉，青史留名","庙堂文臣"],["富甲一方，泽被乡里","商贾巨富"],["技惊四座，名动公卿","百工巨匠"]]],
+  ["心疾","前世临终前，你最放不下的是？",[["未成的最后一器","百工巨匠"],["未参透的那卷经","方外之人"],["未还清的那笔债","商贾巨富"],["未治好的那位病人","悬壶医者"]]],
+  ["铭刻","若前世身份刻上一块无名碑，你希望刻？",[["『此地曾有好人』","庙堂文臣"],["『此字出自其手』","寒窗文士"],["『此路为其所开』","江湖游侠"],["『此身自在来去』","方外之人"]]
+  ]];
+const $=s=>document.querySelector(s);
+const CN=["其一","其二","其三","其四","其五","其六","其七","其八","其九","其十","其十一","其十二","其十三","其十四","其十五","其十六","其十七","其十八"];
+const state={mode:"free",answers:Q.map(()=>null),i:0,timer:null,result:null};
+if("scrollRestoration" in history)history.scrollRestoration="manual";
+const show=id=>{document.querySelectorAll(".screen").forEach(x=>x.classList.remove("on"));$(id).classList.add("on");window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0};
+
+$("#startBtn").onclick=()=>show("#preference");
+$("#prefBack").onclick=()=>show("#intro");
+document.querySelectorAll("#modeGrid .opt").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#modeGrid .opt").forEach(x=>x.classList.remove("sel"));
+  b.classList.add("sel");state.mode=b.dataset.mode;$("#prefNext").disabled=false;
+});
+$("#prefNext").onclick=()=>{state.i=0;renderQ();show("#question")};
+
+function renderQ(){
+  window.scrollTo(0,0);document.documentElement.scrollTop=0;document.body.scrollTop=0;
+  const q=Q[state.i];
+  $("#qNo").textContent=CN[state.i];
+  $("#pText").textContent=`${state.i+1} / ${Q.length}`;
+  $("#tFill").style.width=(state.i/Q.length*100)+"%";
+  $("#qTag").textContent=q[0];
+  $("#qText").textContent=q[1];
+  $("#optList").innerHTML=q[2].map((o,j)=>`<button class="opt ${state.answers[state.i]===j?"sel":""}" data-j="${j}"><span class="mark">${"ABCD"[j]}</span><span>${o[0]}</span></button>`).join("");
+  $("#hint").classList.remove("on");
+  $("#nextBtn").disabled=state.answers[state.i]===null;
+  $("#nextBtn").textContent=state.i===Q.length-1?"显出前世":"下一问";
+  document.querySelectorAll("#optList .opt").forEach(btn=>btn.onclick=()=>{
+    state.answers[state.i]=+btn.dataset.j;
+    document.querySelectorAll("#optList .opt").forEach(x=>x.classList.remove("sel"));
+    btn.classList.add("sel");$("#hint").classList.add("on");
+    clearTimeout(state.timer);state.timer=setTimeout(advance,420);
+  });
+}
+function advance(){
+  if(state.answers[state.i]===null)return;
+  if(state.i<Q.length-1){state.i++;renderQ()}
+  else{finish();show("#result");render()}
+}
+$("#prevBtn").onclick=()=>{if(state.i>0){state.i--;renderQ()}};
+$("#nextBtn").onclick=advance;
+
+/* 偏好权重：文脉加成文士/匠人，武脉加成武将/游侠 */
+function finish(){
+  /* 维度键 = 选项映射所用全名键（SOUL_KEYS 值），先计数再折算短键，避免键名错位产生 NaN */
+  const full=Object.fromEntries(SOULS.map(s=>[SOUL_KEYS[s],0]));
+  state.answers.forEach((a,i)=>full[Q[i][2][a][1]]++);
+  if(state.mode==="art"){full["寒窗文士"]+=1;full["百工巨匠"]+=1}
+  if(state.mode==="war"){full["武将"]+=1;full["江湖游侠"]+=1}
+  const raw=Object.fromEntries(SOULS.map(s=>[s,full[SOUL_KEYS[s]]]));
+  /* 原型向量：自身 6，其余均摊（合计≈18 题），按距离升序固定排序（池=8<20，参照 xingzuo 方案） */
+  const proto=s=>SOULS.map(t=>t===s?6:1.71);
+  const vec=SOULS.map(s=>raw[s]);
+  const dOf=s=>{const p=proto(s);return Math.sqrt(p.reduce((t,v,i)=>t+(vec[i]-v)**2,0))};
+  const ranked=SOULS.map(s=>({s,n:raw[s],d:dOf(s)})).sort((a,b)=>a.d-b.d);
+  const similarity=Math.max(78,Math.min(97,Math.round(100-ranked[0].d*2)));
+  const closeCount=ranked.filter(r=>r.d<=ranked[0].d*1.08).length;
+  const rarity=Math.max(65,Math.min(99,Math.round((SOULS.length-closeCount+1)/SOULS.length*100)));
+  const top5=ranked.slice(0,5).map(r=>({s:r.s,pct:Math.max(55,Math.min(similarity,Math.round(100-r.d*2)))}));
+  const peak=Math.max(...SOULS.map(s=>raw[s]));
+  const life=SOUL_KEYS[ranked[0].s];
+  /* 专属解读：身份 hi（嵌峰值）+ top2 维度赞美（嵌分数）+ 最低维成长 + 礼物总结 + 行动建议 */
+  const dims=SOULS.map(s=>({k:SOUL_KEYS[s],n:raw[s]})).sort((a,b)=>b.n-a.n);
+  const top2=dims.slice(0,2);
+  const lo=dims.slice().sort((a,b)=>a.n-b.n).find(d=>!top2.some(t=>t.k===d.k));
+  const D=DEEP[life];
+  const deep=[D.hi.replace("{peak}",peak),
+    top2.map(d=>PRAISE[d.k].replace("{n}",d.n)).join(""),
+    LOW[lo.k].replace("{n}",lo.n),D.gift,D.act].join("");
+  state.result={life,counts:raw,similarity,rarity,top5,peak,deep};
+}
+function countUp(el,to,dur){dur=dur||1200;const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/dur);el.textContent=Math.round(to*(1-Math.pow(1-k,3)))+"%";if(k<1)requestAnimationFrame(step)};el.textContent="0%";requestAnimationFrame(step);setTimeout(()=>el.textContent=to+"%",dur+200)}
+function render(){
+  const {life,counts,similarity,rarity,peak,top5}=state.result,L=LIVES[life];
+  $("#sealChar").textContent=life[0];
+  $("#rName").textContent=life;
+  $("#rDyn").textContent=`前世行迹 · ${L.dyn}`;
+  $("#rQuote").textContent=`「${L.quote}」`;
+  $("#rTags").innerHTML=L.tags.map(t=>`<span>${t}</span>`).join("");
+  $("#rKarma").textContent=`KARMA-${SOUL_CODE[life]}-${similarity}`;
+  countUp($("#matchRate"),similarity);
+  $("#statRow").innerHTML=[
+    [similarity+"%","契合度"],[rarity+"%","稀有度"],[peak+" 分","魂魄峰值"],[top5[1].pct+"%","次近契合"]
+  ].map(v=>`<div class="stat"><b>${v[0]}</b><span>${v[1]}</span></div>`).join("");
+  $("#rBody").textContent=L.body;$("#rDeep").textContent=state.result.deep;$("#rMark").textContent=L.mark;$("#rTip").textContent=L.tip;
+  const mx=Math.max(...Object.values(counts))||1;
+  $("#rBars").innerHTML=SOULS.map(s=>{const n=counts[s];
+    return `<div class="bar"><span>${SOUL_KEYS[s]}<em>${SOUL_CODE[SOUL_KEYS[s]]}</em></span><span class="tk"><i data-w="${Math.round(n/mx*100)}"></i></span><b>${n}</b></div>`}).join("");
+  $("#rankList").innerHTML=top5.map((r,i)=>
+    `<div class="rank ${i===0?"first":""}"><span class="rk">${["首","贰","叁","肆","伍"][i]}</span><span class="nm"><b>${SOUL_KEYS[r.s]}<em>${SOUL_CODE[SOUL_KEYS[r.s]]}</em></b><small>${LIVES[SOUL_KEYS[r.s]].dyn}</small><i><u data-w="${r.pct}"></u></i></span><span class="pct">${r.pct}%</span></div>`).join("");
+  requestAnimationFrame(()=>{
+    document.querySelectorAll("#rBars .tk i").forEach(el=>el.style.width=el.dataset.w+"%");
+    document.querySelectorAll("#rankList .nm u").forEach(el=>el.style.width=el.dataset.w+"%");
+  });
+  $("#payBox").hidden=!SHOP_URL;
+  if(SHOP_URL)$("#payBtn").onclick=()=>location.href=SHOP_URL;
+}
+$("#againBtn").onclick=()=>{state.answers=Q.map(()=>null);state.i=0;show("#intro")};
+$("#mClose").onclick=()=>$("#mask").classList.remove("on");
+
+/* 浮生帖长图 */
+$("#shareBtn").onclick=function(){
+  const {life,counts,similarity,rarity,peak,top5,deep}=state.result,L=LIVES[life];
+  const c=document.createElement("canvas"),x=c.getContext("2d"),W=750,S=2;
+  const F=(z,w)=>`${w||400} ${z}px "KaiTi","Noto Serif SC","Songti SC",serif`;
+  const wrap=(v,mw,z,w)=>{x.font=F(z,w);const rows=[];let line="";for(const ch of String(v)){if(line&&x.measureText(line+ch).width>mw){rows.push(line);line=ch}else line+=ch}if(line)rows.push(line);return rows};
+  const IW=W-110;
+  const bodyRows=wrap(L.body,IW,15);
+  const tipRows=wrap(L.tip,IW-40,14).length;
+  const deepRows=wrap(deep,IW,15);
+  const H=480+(30+bodyRows.length*26+40)+(30+8*46+40)+(30+deepRows.length*24+40)+(36+5*46+40)+(96+tipRows*24)+160;
+  c.width=W*S;c.height=H*S;x.scale(S,S);
+  x.fillStyle="#f2e8d5";x.fillRect(0,0,W,H);
+  x.fillStyle="#faf4e6";x.fillRect(40,80,W-80,H-160);
+  x.strokeStyle="#d8c9a8";x.lineWidth=2;x.strokeRect(40,80,W-80,H-160);
+  x.strokeStyle="rgba(166,58,43,.55)";x.strokeRect(52,92,W-104,H-184);
+  x.save();x.translate(W-108,128);x.rotate(-.14);x.fillStyle="#a63a2b";x.fillRect(-30,-30,60,60);
+  x.fillStyle="#f6e8d2";x.font=F(30,900);x.textAlign="center";x.textBaseline="middle";x.fillText(life[0],0,1);x.restore();
+  x.textBaseline="alphabetic";x.textAlign="center";
+  x.fillStyle="#8c7c60";x.font=F(13,400);x.fillText("QIANSHI TIE · 前世问帖",W/2,150);
+  x.fillStyle="#3d3226";x.font=F(54,900);x.fillText(life,W/2,218);
+  x.fillStyle="#8c7c60";x.font=F(15,400);x.fillText(`前世行迹 · ${L.dyn}`,W/2,252);
+  x.fillStyle="#a63a2b";x.font=F(15,400);x.fillText(`「${L.quote}」`,W/2,286);
+  x.fillStyle="#a63a2b";L.tags.forEach((t,i)=>{x.font=F(13,700);const w=x.measureText(t).width+24;
+    x.strokeRect(W/2-(L.tags.length*90)/2+i*90,306,w,28);x.fillText(t,W/2-(L.tags.length*90)/2+i*90+w/2,325)});
+  /* 人格编码 KARMA chip + 一行小字说明 */
+  x.font=F(13,700);const kt=`KARMA-${SOUL_CODE[life]}-${similarity}`,kw=x.measureText(kt).width+30;
+  x.strokeStyle="rgba(166,58,43,.5)";x.strokeRect(W/2-kw/2,348,kw,26);
+  x.fillStyle="#a63a2b";x.fillText(kt,W/2,366);
+  x.fillStyle="#8c7c60";x.font=F(10,400);x.fillText("浮生档 KARMA 编码 · 前世身份代号 + 魂魄契合度",W/2,394);
+  /* 四枚数值 chip：值高亮粗体 + 标签小字，横向均分 */
+  [[similarity+"%","契合度"],[rarity+"%","稀有度"],[peak+" 分","魂魄峰值"],[top5[1].pct+"%","次近契合"]].forEach((v,i)=>{const cx=55+IW*(i*2+1)/8;
+    x.fillStyle="#a63a2b";x.font=F(17,900);x.textAlign="center";x.fillText(v[0],cx,420);
+    x.fillStyle="#8c7c60";x.font=F(11,400);x.fillText(v[1],cx,442)});
+  x.textAlign="left";let y=480;
+  x.fillStyle="#3d3226";x.font=F(16,900);x.fillText("前世画像",70,y);
+  bodyRows.forEach((r,i)=>{x.fillStyle="#5a4d3a";x.font=F(15,400);x.fillText(r,70,y+30+i*26)});y+=30+bodyRows.length*26+40;
+  x.fillStyle="#3d3226";x.font=F(16,900);x.fillText("魂魄构成",70,y);
+  const mx=Math.max(...Object.values(state.result.counts))||1;
+  SOULS.forEach((s,i)=>{const ry=y+30+i*46,n=state.result.counts[s];
+    x.fillStyle="#8c7c60";x.font=F(13,400);x.fillText(SOUL_KEYS[s],70,ry+14);
+    const bnm=x.measureText(SOUL_KEYS[s]).width;
+    x.fillStyle="#b3a284";x.font=F(9,400);x.fillText(SOUL_CODE[SOUL_KEYS[s]],70+bnm+7,ry+13);
+    x.fillStyle="#e6d9ba";x.fillRect(70+90,ry+6,IW-90-46,7);
+    x.fillStyle="#a63a2b";x.fillRect(70+90,ry+6,(IW-90-46)*n/mx,7);
+    x.fillStyle="#a63a2b";x.font=F(14,900);x.textAlign="right";x.fillText(n,W-70,ry+14);x.textAlign="left"});
+  y+=30+8*46+40;
+  x.fillStyle="#3d3226";x.font=F(16,900);x.fillText("专属解读 · 为你而写",70,y);
+  deepRows.forEach((r,i)=>{x.fillStyle="#5a4d3a";x.font=F(15,400);x.fillText(r,70,y+30+i*24)});y+=30+deepRows.length*24+40;
+  x.fillStyle="#3d3226";x.font=F(16,900);x.fillText("前世榜 · 宿命最近的五个身份",70,y);
+  top5.forEach((r,i)=>{const ry=y+36+i*46;
+    x.fillStyle=i===0?"#a63a2b":"#8c7c60";x.font=F(14,700);x.fillText(["首","贰","叁","肆","伍"][i],70,ry+17);
+    x.fillStyle="#3d3226";x.font=F(15,900);x.fillText(SOUL_KEYS[r.s],106,ry+16);const nw=x.measureText(SOUL_KEYS[r.s]).width;
+    x.fillStyle="#b3a284";x.font=F(10,400);const cd=SOUL_CODE[SOUL_KEYS[r.s]];x.fillText(cd,106+nw+9,ry+15);
+    x.fillStyle="#8c7c60";x.font=F(11,400);x.fillText(LIVES[SOUL_KEYS[r.s]].dyn,106+nw+9+x.measureText(cd).width+9,ry+16);
+    x.fillStyle="#e6d9ba";x.fillRect(106,ry+26,IW-150,4);
+    const rg=x.createLinearGradient(106,0,106+(IW-150)*r.pct/100,0);rg.addColorStop(0,"#8a5a2a");rg.addColorStop(1,"#a63a2b");x.fillStyle=rg;
+    x.fillRect(106,ry+26,(IW-150)*r.pct/100,4);
+    x.fillStyle="#a63a2b";x.font=F(15,900);x.textAlign="right";x.fillText(r.pct+"%",W-70,ry+18);x.textAlign="left"});
+  y+=36+5*46+40;
+  x.strokeStyle="#a63a2b";x.strokeRect(58,y,W-116,96+tipRows*24);
+  x.fillStyle="#a63a2b";x.font=F(13,900);x.fillText("今生烙印 · 提醒",70,y+26);
+  wrap(L.tip,IW-40,14).forEach((r,i)=>{x.fillStyle="#6a5c44";x.font=F(14,400);x.fillText(r,70,y+52+i*24)});
+  x.fillStyle="#b3a284";x.font=F(12,400);x.textAlign="center";x.fillText("浮生帖 · 前世问命 · 趣味测试",W/2,H-24);
+  $("#mImg").src=c.toDataURL("image/png");$("#mask").classList.add("on");
+};
+</script>
+</body>
+</html>
